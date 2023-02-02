@@ -1,0 +1,99 @@
+id: org.beremiz.Beremiz
+runtime: org.freedesktop.Platform
+runtime-version: '22.08'
+sdk: org.freedesktop.Sdk
+command: beremiz
+finish-args:
+  - --socket=x11
+  - --share=ipc
+  - --device=all
+  - --socket=pulseaudio
+  - --filesystem=home
+
+modules: 
+  - shared-modules/python2.7/python-2.7.json
+  - shared-modules/SDL/sdl12-compat.json
+
+  - name: wxWidgets
+    buildsystem: autotools
+    config-opts:
+      - --disable-monolithic
+      - --disable-rpath
+      - --enable-geometry
+      - --enable-graphics_ctx
+      - --enable-optimise
+      - --enable-sound
+      - --enable-display
+      - --enable-unicode
+      - --with-gtk=3
+      - --with-python=/app/bin/python
+      - --with-opengl
+      - --with-gnomeprint
+      - --with-sdl
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/wxpython/wxPython-src-3.0.2.0.tar.bz2
+        sha256: d54129e5fbea4fb8091c87b2980760b72c22a386cb3b9dd2eebc928ef5e8df61
+      - type: shell
+        commands:
+          - cp /usr/share/gnu-config/config.sub .
+          - cp /usr/share/gnu-config/config.guess .
+
+  - name: wxPython
+    buildsystem: simple
+    build-commands:
+      - >-
+        cd wxPython; /app/bin/python setup.py
+        WXPORT=gtk3
+        UNICODE=1
+        EP_ADD_OPTS=1
+        EP_FULL_VER=0
+        NO_SCRIPTS=1
+        WX_CONFIG="/app/bin/wx-config --prefix=/app --no_rpath"
+        SYS_WX_CONFIG="wx-config --version=3.0.2.0 --toolkit=gtk3 --static=no"
+        build_ext --rpath=/app/lib
+        build
+      - >-
+        cd wxPython; /app/bin/python setup.py
+        WXPORT=gtk3
+        UNICODE=1
+        EP_ADD_OPTS=1
+        EP_FULL_VER=0
+        NO_SCRIPTS=1
+        WX_CONFIG="/app/bin/wx-config --prefix=/app --no_rpath"
+        SYS_WX_CONFIG="wx-config --version=3.0.2.0 --toolkit=gtk3 --static=no --unicode"
+        build_ext --rpath=/app/lib
+        install
+        --root=/
+    sources:
+      - type: archive
+        url: https://downloads.sourceforge.net/wxpython/wxPython-src-3.0.2.0.tar.bz2
+        sha256: d54129e5fbea4fb8091c87b2980760b72c22a386cb3b9dd2eebc928ef5e8df61
+
+  # - name: matiec
+  #   buildsystem: simple
+  #   no-autogen: true
+  #   sources:
+  #     - type: git
+  #       url: https://github.com/beremiz/matiec
+  #       commit: ba00e2b18e7335c03c011e1c6b2a5d99fc3571c3
+  #   build-commands:
+  #     - autoreconf -i
+  #     - ./configure
+  #     - make
+  #     - cp iec2c /app/bin
+  #     - cp iec2iec /app/bin
+  - name: beremiz
+    buildsystem: simple
+    sources:
+      - type: git
+        url: https://github.com/beremiz/beremiz
+        commit: eef0663c8667e37e783227af1388a077a51b8030
+      - type: file
+        path: Beremiz.desktop
+    build-commands:
+      - mkdir -p /app/beremiz
+      - install -Dm755 * /app/beremiz
+      - ln -s /app/beremiz/Beremiz.py  /app/bin/beremiz
+      - install -Dm644 Beremiz.desktop /app/share/applications/${FLATPAK_ID}.desktop
+      - install -Dm644 images/brz.png /app/share/icons/${FLATPAK_ID}.png
