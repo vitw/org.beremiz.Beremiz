@@ -25,9 +25,13 @@ modules:
       - --enable-sound
       - --enable-display
       - --enable-unicode
+      - --enable-image
       - --with-gtk=3
       - --with-python=/app/bin/python
       - --with-opengl
+      - --with-libjpeg
+      - --with-liblibpng
+      - --with-libtiff
       - --with-gnomeprint
       - --with-sdl
     sources:
@@ -88,12 +92,39 @@ modules:
     sources:
       - type: git
         url: https://github.com/beremiz/beremiz
-        commit: eef0663c8667e37e783227af1388a077a51b8030
+        commit: 63cc5c50390e1065ddbd7fe1ba650c96851f44a9
       - type: file
         path: Beremiz.desktop
     build-commands:
       - mkdir -p /app/beremiz
-      - install -Dm755 * /app/beremiz
+      # - mkdir -p /app/beremiz/bacnet
+      # - mkdir -p /app/beremiz/c_ext
+      # - mkdir -p /app/beremiz/canfestival
+      # - mkdir -p /app/beremiz/connectors
+      # - mkdir -p /app/beremiz/controls
+      # - mkdir -p /app/beremiz/dialogs
+      # - mkdir -p /app/beremiz/doc
+      # - mkdir -p /app/beremiz/docutil
+      # - mkdir -p /app/beremiz/editors
+      # - mkdir -p /app/beremiz/etherlab
+      # - mkdir -p /app/beremiz/exemples
+      # - mkdir -p /app/beremiz/graphics
+      # - mkdir -p /app/beremiz/i18n
+      # - mkdir -p /app/beremiz/images
+      # - mkdir -p /app/beremiz/locale
+      # - mkdir -p /app/beremiz/modbus
+      # - mkdir -p /app/beremiz/opc_ua
+      # - mkdir -p /app/beremiz/plcopen
+      # - mkdir -p /app/beremiz/py_ext
+      # - mkdir -p /app/beremiz/runtime
+      # - mkdir -p /app/beremiz/svghmi
+      # - mkdir -p /app/beremiz/targets
+      # - mkdir -p /app/beremiz/tests
+      # - mkdir -p /app/beremiz/util
+      # - mkdir -p /app/beremiz/wxglade_hmi
+      # - mkdir -p /app/beremiz/xmlclass
+      # - install -r -Dm755 * /app/beremiz
+      - cp -r * /app/beremiz
       - ln -s /app/beremiz/Beremiz.py  /app/bin/beremiz
       - install -Dm644 Beremiz.desktop /app/share/applications/${FLATPAK_ID}.desktop
       - install -Dm644 images/brz.png /app/share/icons/${FLATPAK_ID}.png
